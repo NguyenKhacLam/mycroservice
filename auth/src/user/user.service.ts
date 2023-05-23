@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { UserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -8,5 +9,13 @@ export class UserService {
 
   signIn() {
     return 'SignIn';
+  }
+
+  signUp(body: UserDto) {
+    return body;
+  }
+
+  signOut() {
+    return 'signOut';
   }
 }
