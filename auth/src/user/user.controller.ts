@@ -1,4 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
 
@@ -17,7 +23,13 @@ export class UserController {
   }
 
   @Post('signup')
-  signUp(@Body() body: UserDto) {
+  async signUp(@Body() body: UserDto) {
+    const existedUser = await this.userService.getOneByEmail(body.email);
+
+    if (existedUser) {
+      throw new BadRequestException('User existed');
+    }
+
     return this.userService.signUp(body);
   }
 
