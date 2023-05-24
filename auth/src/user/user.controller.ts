@@ -4,13 +4,17 @@ import {
   Controller,
   Get,
   HttpCode,
+  InternalServerErrorException,
   Post,
+  Req,
   Session,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { plainToClass } from 'class-transformer';
+import { Password } from 'src/utils/password';
+import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -20,13 +24,55 @@ export class UserController {
   ) {}
 
   @Get('currentuser')
-  getCurrentUser() {
-    return this.userService.getCurrentUser();
+  getCurrentUser(@Session() session: Record<string, any>) {
+    try {
+      console.log(session);
+
+      if (!session || !session.jwt) {
+        return { currentUser: null };
+      }
+
+      const payload = this.jwtService.verify(session.jwt, {
+        secret: process.env.JWT_KEY ? process.env.JWT_KEY : 'lamnk',
+      });
+
+      return {
+        currentUser: payload,
+      };
+    } catch (error) {
+      console.log(error);
+      // throw new InternalServerErrorException('Something went wrong!');
+      return { currentUser: null };
+    }
   }
 
   @Post('signin')
-  signIn() {
-    return this.userService.signIn();
+  async signIn(@Body() body: UserDto, @Session() session: Record<string, any>) {
+    const existedUser = await this.userService.getOneByEmail(body.email);
+
+    if (!existedUser) {
+      throw new BadRequestException('User not existed');
+    }
+
+    const passwordMatched = await Password.compare(
+      existedUser.password,
+      body.password,
+    );
+
+    if (!passwordMatched) {
+      throw new BadRequestException('Password is not matched');
+    }
+
+    const jwt = this.jwtService.sign({
+      id: existedUser._id,
+      email: existedUser.email,
+    });
+
+    session.jwt = jwt;
+
+    return plainToClass(UserDto, existedUser, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post('signup')
@@ -52,7 +98,9 @@ export class UserController {
   }
 
   @Post('signout')
-  signOut() {
-    return this.userService.signOut();
+  signOut(@Session() session: Record<string, any>) {
+    session.jwt = null;
+
+    return {};
   }
 }

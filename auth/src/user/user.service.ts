@@ -11,7 +11,7 @@ export class UserService {
     return 'getCurrentUser';
   }
 
-  getOneByEmail(email: string) {
+  async getOneByEmail(email: string): Promise<User> {
     return this.userModel.findOne({ email });
   }
 
