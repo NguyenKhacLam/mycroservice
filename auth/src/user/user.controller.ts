@@ -8,12 +8,12 @@ import {
   Session,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserDto } from './user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { plainToClass } from 'class-transformer';
-import { Password } from 'src/utils/password';
 import { IsLoginGuard } from 'src/guards/isLogin.guard';
+import { Password } from 'src/utils/password';
+import { UserDto } from './user.dto';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
