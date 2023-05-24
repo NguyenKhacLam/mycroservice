@@ -28,16 +28,8 @@ export class UserController {
     try {
       console.log(session);
 
-      if (!session || !session.jwt) {
-        return { currentUser: null };
-      }
-
-      const payload = this.jwtService.verify(session.jwt, {
-        secret: process.env.JWT_KEY ? process.env.JWT_KEY : 'lamnk',
-      });
-
       return {
-        currentUser: payload,
+        currentUser: session.user || null,
       };
     } catch (error) {
       console.log(error);
