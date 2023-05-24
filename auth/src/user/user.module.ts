@@ -30,7 +30,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       signOptions: { expiresIn: '120s' },
-      secret: 'lamnk',
+      secret: process.env.JWT_KEY ? process.env.JWT_KEY : 'lamnk',
     }),
   ],
   controllers: [UserController],

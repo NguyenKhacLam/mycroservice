@@ -17,8 +17,6 @@ declare module 'express-session' {
 export class AuthSessionMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
-    console.log(req.session, 'middleware');
-
     if (!req.session || !req.session?.jwt) {
       return next();
     }
@@ -32,18 +30,6 @@ export class AuthSessionMiddleware implements NestMiddleware {
     } catch (error) {
       res.send({ currentUser: null });
     }
-    next();
-  }
-}
-
-@Injectable()
-export class RequiredAuthMiddleware implements NestMiddleware {
-  constructor(private readonly jwtService: JwtService) {}
-  use(req: Request, res: Response, next: NextFunction) {
-    if (!req.session.user) {
-      throw new UnauthorizedException('Unauthorized');
-    }
-
     next();
   }
 }

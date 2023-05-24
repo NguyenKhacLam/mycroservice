@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
@@ -15,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { plainToClass } from 'class-transformer';
 import { Password } from 'src/utils/password';
 import { Request } from 'express';
+import { IsLoginGuard } from 'src/guards/isLogin.guard';
 
 @Controller('users')
 export class UserController {
@@ -24,6 +26,7 @@ export class UserController {
   ) {}
 
   @Get('currentuser')
+  @UseGuards(IsLoginGuard)
   getCurrentUser(@Session() session: Record<string, any>) {
     try {
       console.log(session);
@@ -90,8 +93,10 @@ export class UserController {
   }
 
   @Post('signout')
+  @UseGuards(IsLoginGuard)
   signOut(@Session() session: Record<string, any>) {
     session.jwt = null;
+    session.user = null;
 
     return {};
   }
