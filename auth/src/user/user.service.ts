@@ -19,10 +19,10 @@ export class UserService {
     return 'SignIn';
   }
 
-  signUp(body: UserDto) {
-    const newUser = new this.userModel(body);
+  async signUp(body: UserDto): Promise<User> {
+    const newUser = await this.userModel.create(body);
 
-    return newUser.save();
+    return newUser;
   }
 
   signOut() {

@@ -3,14 +3,21 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
+  Session,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { plainToClass } from 'class-transformer';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Get('currentuser')
   getCurrentUser() {
@@ -23,14 +30,25 @@ export class UserController {
   }
 
   @Post('signup')
-  async signUp(@Body() body: UserDto) {
+  @HttpCode(201)
+  async signUp(@Body() body: UserDto, @Session() session: Record<string, any>) {
     const existedUser = await this.userService.getOneByEmail(body.email);
 
     if (existedUser) {
       throw new BadRequestException('User existed');
     }
 
-    return this.userService.signUp(body);
+    const newUser = await this.userService.signUp(body);
+
+    // Add jwt -> store in session
+    const jwt = this.jwtService.sign({
+      id: newUser._id,
+      email: newUser.email,
+    });
+
+    session.jwt = jwt;
+
+    return plainToClass(UserDto, newUser, { excludeExtraneousValues: true });
   }
 
   @Post('signout')

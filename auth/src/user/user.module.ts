@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User, UserSchema } from './user.schema';
 import { Password } from 'src/utils/password';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -26,6 +27,11 @@ import { Password } from 'src/utils/password';
         },
       },
     ]),
+    JwtModule.register({
+      global: true,
+      signOptions: { expiresIn: '120s' },
+      secret: 'lamnk',
+    }),
   ],
   controllers: [UserController],
   providers: [UserService],
