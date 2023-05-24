@@ -4,9 +4,7 @@ import {
   Controller,
   Get,
   HttpCode,
-  InternalServerErrorException,
   Post,
-  Req,
   Session,
   UseGuards,
 } from '@nestjs/common';
@@ -15,7 +13,6 @@ import { UserDto } from './user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { plainToClass } from 'class-transformer';
 import { Password } from 'src/utils/password';
-import { Request } from 'express';
 import { IsLoginGuard } from 'src/guards/isLogin.guard';
 
 @Controller('users')
