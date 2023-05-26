@@ -23,7 +23,7 @@ export class UserController {
   ) {}
 
   @Get('currentuser')
-  @UseGuards(IsLoginGuard)
+  // @UseGuards(IsLoginGuard)
   getCurrentUser(@Session() session: Record<string, any>) {
     try {
       console.log(session);
